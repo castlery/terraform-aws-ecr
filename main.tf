@@ -27,6 +27,18 @@ resource "aws_ecr_repository" "default" {
   tags = module.label.tags
 }
 
+data "template_file" "ecr_lifecycle_policy_rule_tagged" {
+  template = "${file("${path.module}/files/rule_tagged.json.tpl")}"
+  count    = "${length(var.tag_prefix_list)}"
+
+  vars = {
+    priority         = "${count.index + 2}"
+    image_limit      = "${var.max_tagged_image_count}"
+    image_tag_prefix = "${element(var.tag_prefix_list, count.index)}"
+  }
+}
+
+
 resource "aws_ecr_lifecycle_policy" "default" {
   count      = var.enabled ? 1 : 0
   repository = join("", aws_ecr_repository.default.*.name)
@@ -40,24 +52,13 @@ resource "aws_ecr_lifecycle_policy" "default" {
       "selection": {
         "tagStatus": "untagged",
         "countType": "imageCountMoreThan",
-        "countNumber": 1
+        "countNumber": "${var.max_untagged_image_count}"
       },
       "action": {
         "type": "expire"
       }
     },
-    {
-      "rulePriority": 2,
-      "description": "Rotate images when reach ${var.max_image_count} images stored",
-      "selection": {
-        "tagStatus": "any",
-        "countType": "imageCountMoreThan",
-        "countNumber": ${var.max_image_count}
-      },
-      "action": {
-        "type": "expire"
-      }
-    }
+    ${join(",", data.template_file.ecr_lifecycle_policy_rule_tagged.*.rendered)}
   ]
 }
 EOF

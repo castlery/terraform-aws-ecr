@@ -63,9 +63,27 @@ variable "scan_images_on_push" {
   default     = false
 }
 
+variable "tag_prefix_list" {
+  type        = list(string)
+  default     = []
+  description = "Image tag prefix (e.g. `sg-test`) for ecr lifecycle policy"
+}
+
+variable "max_untagged_image_count" {
+  default     = 1
+  type        = "string"
+  description = "The maximum number of untagged images that you want to retain in repository."
+}
+
+variable "max_tagged_image_count" {
+  default     = 100
+  type        = "string"
+  description = "The maximum number of tagged images that you want to retain in repository."
+}
+
 variable "max_image_count" {
-  description = "How many Docker Image versions AWS ECR will store"
-  default     = 500
+  description = "How many Docker Image versions AWS ECR will store for tagged images"
+  default     = 100
 }
 
 variable "regex_replace_chars" {
