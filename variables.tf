@@ -70,7 +70,7 @@ variable "tag_prefix_list" {
 }
 
 variable "max_untagged_image_count" {
-  default     = 1
+  default     = 10
   type        = "string"
   description = "The maximum number of untagged images that you want to retain in repository."
 }
