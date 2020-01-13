@@ -52,7 +52,7 @@ resource "aws_ecr_lifecycle_policy" "default" {
       "selection": {
         "tagStatus": "untagged",
         "countType": "imageCountMoreThan",
-        "countNumber": "${var.max_untagged_image_count}"
+        "countNumber": ${var.max_untagged_image_count}
       },
       "action": {
         "type": "expire"
